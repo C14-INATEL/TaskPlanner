@@ -1,47 +1,43 @@
-tasks = []
+from database.database import db
+from models.task import Task
 
 
 def create_task(data):
-    task = {
-        "id": len(tasks) + 1,
-        "title": data["title"],
-        "done": False
-    }
+    task = Task()
+    task.title = data.get("title")
+    task.description = data.get("description")
 
-    tasks.append(task)
-    return task
-
+    db.session.add(task)
+    db.session.commit()
+    return task.to_dict()
 
 def get_tasks():
-    return tasks
-
-
+    tasks = Task.query.all()
+    return [t.to_dict() for t in tasks]
+    
 def get_task_by_id(task_id):
-    for t in tasks:
-        if t["id"] == task_id:
-            return t
+    task = Task.query.get(task_id)
+    if task:
+        return task.to_dict()
     return None
 
 def update_task(task_id, data):
-    for t in tasks:
-        if t["id"] == task_id:
-            if "title" in data:
-                t["title"] = data["title"]
-
-            if "done" in data:
-                t["done"] = data["done"]
-
-            return t
-
+    task = Task.query.get(task_id)
+    if task:
+        if "title" in data:
+            task.title = data["title"]
+        if "description" in data:
+            task.description = data["description"]
+        if "completed" in data:
+            task.completed = data["completed"]
+        db.session.commit()
+        return task.to_dict()
     return None
 
 def delete_task(task_id):
-    global tasks
-
-    new_tasks = []
-
-    for t in tasks:
-        if t["id"] != task_id:
-            new_tasks.append(t)
-
-    tasks = new_tasks
+    task = Task.query.get(task_id)
+    if task:
+        db.session.delete(task)
+        db.session.commit()
+        return True
+    return False
