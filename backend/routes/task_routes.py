@@ -6,6 +6,9 @@ task = Blueprint('task', __name__)
 @task.route('/tasks', methods=['POST'])
 def create():
     data = request.get_json()
+    if not data.get("title"):
+        return jsonify({'message': "O campo 'título' é obrigatório"}), 400
+    
     new_task = create_task(data)
     return jsonify(new_task), 201
 
@@ -26,7 +29,7 @@ def update(task_id):
     data = request.get_json()
     updated_task = update_task(task_id, data)
     if updated_task:
-        return jsonify(updated_task), 200
+        return jsonify({'message': 'Tarefa atualizada com sucesso'}), 200
     return jsonify({'message': 'Tarefa não encontrada'}), 404
 
 @task.route('/tasks/<int:task_id>', methods=['DELETE'])
