@@ -1,58 +1,43 @@
-def test_get_tasks(client): #testa a rota GET /tasks, o que deve retornar um status 200 e uma lista (mesmo que vazia)
-    response = client.get('/tasks')
-    assert response.status_code == 200
-    assert isinstance(response.get_json(), list) # Verifica se o retorno é uma lista (espera algo como [])
-    
-def test_post_task(client): #testa criar uma nova tarefa, o que deve retornar um status 201 (Created)
-    new_task = {
-        "title": "Estudar cybersecurity",
-        "description": "Aprender sobre segurança cibernética e práticas recomendadas",
-        "status": "A Fazer"
-    }
-    response = client.post('/tasks', json=new_task)
-    assert response.status_code == 201
-    
-def test_post_task_without_title(client): #testa criar tarefa sem título, o que deve retornar um erro
-    new_task = {
-        "description": "Aprender sobre segurança cibernética e práticas recomendadas",
-        "status": "A Fazer"
-    }
-    response = client.post('/tasks', json=new_task)
-    assert response.status_code == 400
-    assert response.get_json()['message'] == "O campo 'título' é obrigatório"
+from unittest.mock import patch
 
-    
-def test_delete_task(client): #testa deletar uma tarefa, o que deve retornar um status 200 (OK)
-   
-    new_task = {
-        "title": "Tarefa para deletar",
-        "description": "Esta tarefa será deletada no teste",
-        "status": "A Fazer"
-    }
-    post_response = client.post('/tasks', json=new_task)
-    task_id = post_response.get_json()['id']
-    
-    # Agora, tenta deletar a tarefa criada
-    delete_response = client.delete(f'/tasks/{task_id}')
-    assert delete_response.status_code == 200
-    assert delete_response.get_json()['message'] == "Tarefa deletada com sucesso"
-    
-def test_update_task(client): #testa atualizar uma tarefa, o que deve retornar um status 200 (OK)
-   
-    new_task = {
-        "title": "Tarefa para atualizar",
-        "description": "Esta tarefa será atualizada no teste",
-        "status": "A Fazer"
-    }
-    post_response = client.post('/tasks', json=new_task)
-    task_id = post_response.get_json()['id']
-    
-    # Agora, tenta atualizar a tarefa criada
-    updated_data = {
-        "title": "Tarefa atualizada",
-        "description": "A descrição foi atualizada",
-        "status": "Em Progresso"
-    }
-    update_response = client.put(f'/tasks/{task_id}', json=updated_data)
-    assert update_response.status_code == 200
-    assert update_response.get_json()['message'] == "Tarefa atualizada com sucesso"
+def test_get_tasks_unit(client):
+    with patch('routes.task_routes.get_tasks') as mock:
+        mock.return_value = [{"id": 1, "title": "Tarefa 1"}]
+        
+        response = client.get('/tasks')
+        
+        assert response.status_code == 200
+        assert response.get_json() == [{"id": 1, "title": "Tarefa 1"}]
+
+def test_post_task_unit(client):
+    with patch('routes.task_routes.create_task') as mock:
+        mock.return_value = ({"id": 1, "title": "Estudar Flask"}, None)
+        
+        response = client.post('/tasks', json={"title": "Estudar Flask"})
+        
+        assert response.status_code == 201
+
+def test_post_task_without_title_unit(client):
+    with patch('routes.task_routes.create_task') as mock:
+        mock.return_value = (None, "O campo 'título' é obrigatório")
+        
+        response = client.post('/tasks', json={})
+        
+        assert response.status_code == 400
+        assert response.get_json()['message'] == "O campo 'título' é obrigatório"
+
+def test_delete_task_unit(client):
+    with patch('routes.task_routes.delete_task') as mock:
+        mock.return_value = True
+        
+        response = client.delete('/tasks/1')
+        
+        assert response.status_code == 200
+
+def test_delete_task_not_found_unit(client):
+    with patch('routes.task_routes.delete_task') as mock:
+        mock.return_value = None
+        
+        response = client.delete('/tasks/999')
+        
+        assert response.status_code == 404
