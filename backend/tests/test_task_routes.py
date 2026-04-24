@@ -41,3 +41,23 @@ def test_delete_task_not_found_unit(client):
         response = client.delete('/tasks/999')
         
         assert response.status_code == 404
+        
+        
+def test_get_tasks_empty(client):
+    with patch('routes.task_routes.get_tasks') as mock:
+        mock.return_value = []
+        
+        response = client.get('/tasks')
+        
+        assert response.status_code == 200
+        assert response.get_json() == []
+        
+
+def test_post_empty_body(client):
+    with patch('routes.task_routes.create_task') as mock:
+        mock.return_value = (None, "O campo 'título' é obrigatório")
+        
+        response = client.post('/tasks', json={})
+        
+        assert response.status_code == 400
+        assert response.get_json()['message'] == "O campo 'título' é obrigatório"
