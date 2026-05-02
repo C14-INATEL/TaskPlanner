@@ -2,27 +2,22 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DndContext } from '@dnd-kit/core';
 
-// Importando os seus componentes reais
 import Board from '../src/components/Board';
 import Card from '../src/components/Card';
 
-// Limpa o localStorage antes de cada teste para não vazar dados de um teste para outro
 beforeEach(() => {
     window.localStorage.clear();
 });
 
 describe('Testes de Renderização e Componentes Visuais do Kanban', () => {
 
-    // Teste 1: O componente principal do Quadro
     it('deve renderizar o quadro Kanban principal na tela', () => {
         render(<Board />);
 
-        // Procura por textos estáticos que você colocou no Board.tsx
-        expect(screen.getByText('Seu painel de tarefas')).toBeInTheDocument();
+        expect(screen.getByText('Painel de Tarefas')).toBeInTheDocument();
         expect(screen.getByText(/Task Planner/i)).toBeInTheDocument();
     });
 
-    // Teste 2: As três colunas
     it('deve exibir as três colunas padrão: A Fazer, Em Progresso e Concluído', () => {
         render(<Board />);
 
@@ -31,9 +26,7 @@ describe('Testes de Renderização e Componentes Visuais do Kanban', () => {
         expect(screen.getByText('Concluído')).toBeInTheDocument();
     });
 
-    // Teste 3: O componente do Cartão de Tarefa via props
     it('deve renderizar o título e a descrição de um cartão de tarefa passados via props', () => {
-        // Montamos uma "tarefa falsa" com o tipo exato que o seu Card pede
         const mockTask = {
             id: 1,
             title: 'Estudar Engenharia de Software',
@@ -44,11 +37,9 @@ describe('Testes de Renderização e Componentes Visuais do Kanban', () => {
             priority: 'high' as const
         };
 
-        // Criamos funções vazias (mocks) para simular as props de deletar e editar
         const mockDeleteTask = jest.fn();
         const mockOpenEditModal = jest.fn();
 
-        // Renderizamos o Card envolto no DndContext para não dar erro de Drag and Drop
         render(
             <DndContext>
                 <Card
@@ -61,22 +52,183 @@ describe('Testes de Renderização e Componentes Visuais do Kanban', () => {
 
         expect(screen.getByText('Estudar Engenharia de Software')).toBeInTheDocument();
         expect(screen.getByText('Fazer a Tarefa 3 de testes unitários')).toBeInTheDocument();
-        expect(screen.getByText('🔴 Alta')).toBeInTheDocument(); // Verifica se a tag de prioridade renderizou
+        expect(screen.getByText('Alta')).toBeInTheDocument();
     });
 
-    // Teste 4: O Formulário de Nova Tarefa
     it('deve renderizar os campos de texto do formulário após clicar em Nova Tarefa', () => {
         render(<Board />);
 
-        // Primeiro, precisamos achar o botão e clicar nele (simulando o usuário)
-        const btnNovaTarefa = screen.getByText(/Nova tarefa/i);
-        fireEvent.click(btnNovaTarefa);
+        fireEvent.click(screen.getByText('Nova Tarefa'));
 
-        // Agora sim, os inputs devem estar visíveis na tela
-        const titleInput = screen.getByPlaceholderText('Título');
-        const descInput = screen.getByPlaceholderText('Descrição');
+        expect(screen.getByPlaceholderText('Ex: Finalizar relatório')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Detalhes da tarefa...')).toBeInTheDocument();
+    });
+});
 
-        expect(titleInput).toBeInTheDocument();
-        expect(descInput).toBeInTheDocument();
+describe('Testes de Lógica com Mocks (Tarefa 4)', () => {
+
+    beforeEach(() => {
+        window.localStorage.clear();
+        jest.clearAllMocks();
+    });
+
+    it('deve carregar as tarefas do LocalStorage ao iniciar o Board (Mock de Dependência)', () => {
+        const mockTasks = [
+            {
+                id: 123,
+                title: 'Tarefa Mockada Inatel',
+                description: 'Testando Mock C14',
+                date: '',
+                time: '',
+                status: 'todo',
+                priority: 'high'
+            }
+        ];
+
+        const getItemSpy = jest.spyOn(Storage.prototype, 'getItem').mockReturnValue(JSON.stringify(mockTasks));
+
+        render(<Board />);
+
+        expect(screen.getByText('Tarefa Mockada Inatel')).toBeInTheDocument();
+
+        getItemSpy.mockRestore();
+    });
+
+    it('deve simular a exclusão de uma tarefa mockando a confirmação do usuário', () => {
+        const confirmSpy = jest.spyOn(window, 'confirm').mockImplementation(() => true);
+
+        render(<Board />);
+
+        fireEvent.click(screen.getByText('Nova Tarefa'));
+        fireEvent.change(screen.getByPlaceholderText('Ex: Finalizar relatório'), { target: { value: 'Tarefa para Deletar' } });
+        fireEvent.click(screen.getByText('Adicionar Tarefa'));
+
+        const deleteButton = screen.getByRole('button', { name: 'Excluir tarefa' });
+        fireEvent.click(deleteButton);
+
+        expect(confirmSpy).toHaveBeenCalled();
+        expect(screen.queryByText('Tarefa para Deletar')).not.toBeInTheDocument();
+
+        confirmSpy.mockRestore();
+    });
+
+    it('deve gerar um ID único baseado no timestamp mockado ao adicionar tarefa', () => {
+        const mockTimestamp = 123456789;
+        const dateSpy = jest.spyOn(Date, 'now').mockReturnValue(mockTimestamp);
+
+        render(<Board />);
+
+        fireEvent.click(screen.getByText('Nova Tarefa'));
+        fireEvent.change(screen.getByPlaceholderText('Ex: Finalizar relatório'), { target: { value: 'Tarefa com ID Fixo' } });
+        fireEvent.click(screen.getByText('Adicionar Tarefa'));
+
+        const savedData = JSON.parse(localStorage.getItem('tasks') || '[]');
+        expect(savedData[0].id).toBe(mockTimestamp);
+
+        dateSpy.mockRestore();
+    });
+
+    it('deve chamar o localStorage.setItem com os dados corretos ao adicionar uma nova tarefa', () => {
+        const setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
+
+        render(<Board />);
+
+        fireEvent.click(screen.getByText('Nova Tarefa'));
+        fireEvent.change(screen.getByPlaceholderText('Ex: Finalizar relatório'), { target: { value: 'Persistir no Banco' } });
+        fireEvent.click(screen.getByText('Adicionar Tarefa'));
+
+        expect(setItemSpy).toHaveBeenCalled();
+
+        const lastCallArgs = setItemSpy.mock.calls[setItemSpy.mock.calls.length - 1];
+        expect(lastCallArgs[1]).toContain('Persistir no Banco');
+
+        setItemSpy.mockRestore();
+    });
+
+    it('deve atualizar uma tarefa existente quando o Mock de salvamento for acionado', () => {
+        const initialTask = [{
+            id: 1,
+            title: 'Antigo',
+            description: 'Velho',
+            date: '',
+            time: '',
+            status: 'todo',
+            priority: 'low'
+        }];
+        jest.spyOn(Storage.prototype, 'getItem').mockReturnValue(JSON.stringify(initialTask));
+
+        render(<Board />);
+
+        const editButton = screen.getByRole('button', { name: 'Editar tarefa' });
+        fireEvent.click(editButton);
+
+        const inputEdit = screen.getByDisplayValue('Antigo');
+        fireEvent.change(inputEdit, { target: { value: 'Novo Título Atualizado' } });
+
+        fireEvent.click(screen.getByText('Salvar'));
+
+        expect(screen.getByText('Novo Título Atualizado')).toBeInTheDocument();
+        expect(screen.queryByText('Antigo')).not.toBeInTheDocument();
+    });
+});
+
+describe('Novos Testes Mock', () => {
+
+    beforeEach(() => {
+        window.localStorage.clear();
+        jest.clearAllMocks();
+    });
+
+    // Novo Teste 1: confirm(false) → tarefa NÃO deve ser excluída
+    it('não deve excluir a tarefa quando o usuário cancelar a confirmação (confirm = false)', () => {
+        const confirmSpy = jest.spyOn(window, 'confirm').mockImplementation(() => false);
+
+        render(<Board />);
+
+        fireEvent.click(screen.getByText('Nova Tarefa'));
+        fireEvent.change(screen.getByPlaceholderText('Ex: Finalizar relatório'), {
+            target: { value: 'Tarefa para Manter' }
+        });
+        fireEvent.click(screen.getByText('Adicionar Tarefa'));
+
+        const deleteButton = screen.getByRole('button', { name: 'Excluir tarefa' });
+        fireEvent.click(deleteButton);
+
+        expect(confirmSpy).toHaveBeenCalled();
+        expect(screen.getByText('Tarefa para Manter')).toBeInTheDocument();
+
+        confirmSpy.mockRestore();
+    });
+
+    // Novo Teste 2: callback openEditModal do Card chamado com a tarefa correta
+    it('deve chamar openEditModal com a tarefa correta ao clicar no botão de editar do Card', () => {
+        const mockTask = {
+            id: 42,
+            title: 'Tarefa Callback Test',
+            description: 'Verificando callback',
+            date: '2026-05-01',
+            time: '10:00',
+            status: 'todo',
+            priority: 'medium' as const
+        };
+
+        const mockDeleteTask = jest.fn();
+        const mockOpenEditModal = jest.fn();
+
+        render(
+            <DndContext>
+                <Card
+                    task={mockTask}
+                    deleteTask={mockDeleteTask}
+                    openEditModal={mockOpenEditModal}
+                />
+            </DndContext>
+        );
+
+        const editButton = screen.getByRole('button', { name: 'Editar tarefa' });
+        fireEvent.click(editButton);
+
+        expect(mockOpenEditModal).toHaveBeenCalledTimes(1);
+        expect(mockOpenEditModal).toHaveBeenCalledWith(mockTask);
     });
 });
