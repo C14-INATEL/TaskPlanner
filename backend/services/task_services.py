@@ -10,14 +10,16 @@ def create_task(data):
     if not data or not data.get("title"):
         raise ValueError("Titulo obrigatorio")
 
-    task = Task()
-    task.title = data.get("title")
-    task.description = data.get("description")
-    task.status = "A Fazer"
-
+    task = Task(
+        title=data.get("title"),
+        description=data.get("description"),
+        status="todo",
+        date=data.get("date"),
+        time=data.get("time"),
+        priority=data.get("priority", "medium"),
+    )
     db.session.add(task)
     db.session.commit()
-
     return task.to_dict()
 
 
@@ -41,11 +43,14 @@ def update_task(task_id, data):
     if not task:
         raise TaskNotFound("Tarefa nao encontrada")
 
-    if "title" in data and not data["title"]:
-        raise ValueError("Titulo obrigatorio")
+    if "title" in data:
+        if not data["title"]:
+            raise ValueError("Titulo obrigatorio")
+        task.title = data["title"]
 
-    if "status" in data:
-        task.status = data["status"]
+    for field in ("description", "status", "date", "time", "priority"):
+        if field in data:
+            setattr(task, field, data[field])
 
     db.session.commit()
     return task.to_dict()

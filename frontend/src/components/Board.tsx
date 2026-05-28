@@ -8,16 +8,7 @@ import {
   DragOverlay
 } from "@dnd-kit/core"
 import Column from "./Column"
-
-type Task = {
-  id: number
-  title: string
-  description: string
-  date: string
-  time: string
-  status: string
-  priority: "low" | "medium" | "high"
-}
+import { fetchTasks, createTask as apiCreate, updateTask as apiUpdate, deleteTask as apiDelete, Task } from "@/services/api"
 
 const inputStyle =
   "w-full bg-gray-700/50 border border-white/10 rounded-xl px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
@@ -37,44 +28,43 @@ export default function Board() {
   })
 
   useEffect(() => {
-    const saved = localStorage.getItem("tasks")
-    if (saved) setTasks(JSON.parse(saved))
+    fetchTasks().then(setTasks).catch(console.error)
   }, [])
 
-  useEffect(() => {
-    localStorage.setItem("tasks", JSON.stringify(tasks))
-  }, [tasks])
-
-  function addTask() {
+  async function addTask() {
     if (!newTask.title.trim()) return
-
-    const task: Task = {
-      id: Date.now(),
-      title: newTask.title,
-      description: newTask.description,
-      date: newTask.date,
-      time: newTask.time,
-      status: "todo",
-      priority: newTask.priority
+    try {
+      const created = await apiCreate({ ...newTask, status: "todo" })
+      setTasks(prev => [...prev, created])
+      setNewTask({ title: "", description: "", date: "", time: "", priority: "medium" })
+      setShowForm(false)
+    } catch (err) {
+      console.error(err)
     }
-
-    setTasks(prev => [...prev, task])
-    setNewTask({ title: "", description: "", date: "", time: "", priority: "medium" })
-    setShowForm(false)
   }
 
-  function deleteTask(id: number) {
+  async function deleteTask(id: number) {
     if (!confirm("Tem certeza que deseja excluir?")) return
-    setTasks(prev => prev.filter(task => task.id !== id))
+    try {
+      await apiDelete(id)
+      setTasks(prev => prev.filter(t => t.id !== id))
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   function openEditModal(task: Task) {
     setEditingTask(task)
   }
 
-  function saveEditTask(updatedTask: Task) {
-    setTasks(prev => prev.map(task => task.id === updatedTask.id ? updatedTask : task))
-    setEditingTask(null)
+  async function saveEditTask(updatedTask: Task) {
+    try {
+      await apiUpdate(updatedTask.id, updatedTask)
+      setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t))
+      setEditingTask(null)
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   function handleDragStart(event: DragStartEvent) {
@@ -83,16 +73,21 @@ export default function Board() {
     if (task) setActiveTask(task)
   }
 
-  function handleDragEnd(event: DragEndEvent) {
+  async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     setActiveTask(null)
     if (!over) return
 
     const taskId = Number(active.id)
     const newStatus = over.id as string
-    setTasks(prev =>
-      prev.map(task => task.id === taskId ? { ...task, status: newStatus } : task)
-    )
+    try {
+      await apiUpdate(taskId, { status: newStatus })
+      setTasks(prev =>
+        prev.map(task => task.id === taskId ? { ...task, status: newStatus } : task)
+      )
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   return (
@@ -167,11 +162,6 @@ export default function Board() {
           {showForm ? "Fechar" : "Nova Tarefa"}
         </button>
 
-        {/*
-          FORM — sempre montado no DOM.
-          grid-template-rows anima a altura de 0 → 1fr suavemente,
-          sem fazer as colunas pularem.
-        */}
         <div
           style={{
             display: "grid",

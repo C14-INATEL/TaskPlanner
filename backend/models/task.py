@@ -1,17 +1,23 @@
 from database.database import db
 
 class Task(db.Model):
-    __tablename__ = 'tasks' #nome da tabela no banco de dados
+    __tablename__ = 'tasks'
 
-    id = db.Column(db.Integer, primary_key=True) #coluna id, do tipo inteiro, é a chave primária da tabela
-    title = db.Column(db.String(100), nullable=False) #coluna title, do tipo string, com tamanho máximo de 100 caracteres, não pode ser nula
-    description = db.Column(db.String(255)) #coluna description, do tipo string, com tamanho máximo de 255 caracteres, pode ser nula
-    status = db.Column(db.String(50), default='A Fazer') #coluna status, do tipo string, com valor padrão 'A Fazer'
+    id          = db.Column(db.Integer, primary_key=True)
+    title       = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(255))
+    status      = db.Column(db.String(50), default='todo')
+    date        = db.Column(db.String(20))
+    time        = db.Column(db.String(10))
+    priority    = db.Column(db.String(10), default='medium')
 
-    def to_dict(self): #método para converter o objeto Task em um dicionário, facilitando a serialização para JSON  
+    def to_dict(self):
         return {
-            'id': self.id,
-            'title': self.title,
+            'id':          self.id,
+            'title':       self.title,
             'description': self.description,
-            'status': self.status
+            'status':      self.status,
+            'date':        self.date,
+            'time':        self.time,
+            'priority':    self.priority,
         }
