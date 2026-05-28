@@ -1,6 +1,9 @@
 from database.database import db
 from models.task import Task
 
+VALID_PRIORITIES = {"low", "medium", "high"}
+VALID_STATUSES = {"todo", "doing", "done"}
+
 
 class TaskNotFound(Exception):
     pass
@@ -10,13 +13,23 @@ def create_task(data):
     if not data or not data.get("title"):
         raise ValueError("Titulo obrigatorio")
 
+    title = data.get("title").strip()
+    if not title:
+        raise ValueError("Titulo nao pode ser apenas espacos")
+    if len(title) > 100:
+        raise ValueError("Titulo nao pode ter mais de 100 caracteres")
+
+    priority = data.get("priority", "medium")
+    if priority not in VALID_PRIORITIES:
+        raise ValueError(f"Priority invalida. Use: {', '.join(VALID_PRIORITIES)}")
+
     task = Task(
-        title=data.get("title"),
+        title=title,
         description=data.get("description"),
         status="todo",
         date=data.get("date"),
         time=data.get("time"),
-        priority=data.get("priority", "medium"),
+        priority=priority,
     )
     db.session.add(task)
     db.session.commit()
@@ -44,11 +57,24 @@ def update_task(task_id, data):
         raise TaskNotFound("Tarefa nao encontrada")
 
     if "title" in data:
-        if not data["title"]:
+        title = data["title"]
+        if not title or not title.strip():
             raise ValueError("Titulo obrigatorio")
-        task.title = data["title"]
+        if len(title) > 100:
+            raise ValueError("Titulo nao pode ter mais de 100 caracteres")
+        task.title = title.strip()
 
-    for field in ("description", "status", "date", "time", "priority"):
+    if "status" in data:
+        if data["status"] not in VALID_STATUSES:
+            raise ValueError(f"Status invalido. Use: {', '.join(VALID_STATUSES)}")
+        task.status = data["status"]
+
+    if "priority" in data:
+        if data["priority"] not in VALID_PRIORITIES:
+            raise ValueError(f"Priority invalida. Use: {', '.join(VALID_PRIORITIES)}")
+        task.priority = data["priority"]
+
+    for field in ("description", "date", "time"):
         if field in data:
             setattr(task, field, data[field])
 
