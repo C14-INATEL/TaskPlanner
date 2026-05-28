@@ -1,4 +1,5 @@
 from unittest.mock import patch
+from services.task_services import TaskNotFound
 
 def test_get_tasks_unit(client):
     with patch('routes.task_routes.get_tasks') as mock:
@@ -11,7 +12,7 @@ def test_get_tasks_unit(client):
 
 def test_post_task_unit(client):
     with patch('routes.task_routes.create_task') as mock:
-        mock.return_value = ({"id": 1, "title": "Estudar Flask"}, None)
+        mock.return_value = {"id": 1, "title": "Estudar Flask"}
         
         response = client.post('/tasks', json={"title": "Estudar Flask"})
         
@@ -19,7 +20,7 @@ def test_post_task_unit(client):
 
 def test_post_task_without_title_unit(client):
     with patch('routes.task_routes.create_task') as mock:
-        mock.return_value = (None, "O campo 'título' é obrigatório")
+        mock.side_effect = ValueError("O campo 'título' é obrigatório")
         
         response = client.post('/tasks', json={})
         
@@ -36,13 +37,12 @@ def test_delete_task_unit(client):
 
 def test_delete_task_not_found_unit(client):
     with patch('routes.task_routes.delete_task') as mock:
-        mock.return_value = None
+        mock.side_effect = TaskNotFound("Tarefa não encontrada")
         
         response = client.delete('/tasks/999')
         
         assert response.status_code == 404
-        
-        
+
 def test_get_tasks_empty(client):
     with patch('routes.task_routes.get_tasks') as mock:
         mock.return_value = []
@@ -51,11 +51,10 @@ def test_get_tasks_empty(client):
         
         assert response.status_code == 200
         assert response.get_json() == []
-        
 
 def test_post_empty_body(client):
     with patch('routes.task_routes.create_task') as mock:
-        mock.return_value = (None, "O campo 'título' é obrigatório")
+        mock.side_effect = ValueError("O campo 'título' é obrigatório")
         
         response = client.post('/tasks', json={})
         
