@@ -1,8 +1,9 @@
-version: '3.8'
 
 services:
   jenkins:
-    image: jenkins/jenkins:lts-jdk17
+    build:
+        context: ./jenkins
+        dockerfile: Dockerfile
     container_name: jenkins-taskplanner
     user: root
     ports:
@@ -12,6 +13,8 @@ services:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
+    environment:
+      - TZ=America/Sao_Paulo
 
 volumes:
   jenkins_home:
