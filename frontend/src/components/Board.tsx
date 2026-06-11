@@ -57,7 +57,8 @@ export default function Board() {
     setEditingTask(task)
   }
 
-  async function saveEditTask(updatedTask: Task) {
+  async function saveEditTask(updatedTask: Task) 
+  {
     try {
       await apiUpdate(updatedTask.id, updatedTask)
       setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t))

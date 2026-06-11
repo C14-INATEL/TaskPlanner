@@ -1,0 +1,7 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "taskplanner-backend"
+version = "1.0.0"
