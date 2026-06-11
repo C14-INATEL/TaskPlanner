@@ -5,3 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "taskplanner-backend"
 version = "1.0.0"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["routes*", "models*", "services*", "database*"]
