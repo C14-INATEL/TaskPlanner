@@ -134,7 +134,7 @@ describe('Testes de Lógica com Mocks (Tarefa 4)', () => {
 
         expect(await screen.findByText('Tarefa para Deletar')).toBeInTheDocument();
 
-        const deleteButton = screen.getByRole('button', { name: 'Excluir tarefa' });
+        const deleteButton = await screen.findByRole('button', { name: 'Excluir tarefa' });
         fireEvent.click(deleteButton);
 
         expect(confirmSpy).toHaveBeenCalled();
@@ -193,7 +193,6 @@ describe('Testes de Lógica com Mocks (Tarefa 4)', () => {
 
 describe('Novos Testes Mock', () => {
 
-    // confirm(false) → tarefa NÃO deve ser excluída
     it('não deve excluir a tarefa quando o usuário cancelar a confirmação (confirm = false)', async () => {
         const confirmSpy = jest.spyOn(window, 'confirm').mockImplementation(() => false);
         mockFetchTasks.mockResolvedValue([
@@ -212,7 +211,7 @@ describe('Novos Testes Mock', () => {
 
         expect(await screen.findByText('Tarefa para Manter')).toBeInTheDocument();
 
-        const deleteButton = screen.getByRole('button', { name: 'Excluir tarefa' });
+        const deleteButton = await screen.findByRole('button', { name: 'Excluir tarefa' });
         fireEvent.click(deleteButton);
 
         expect(confirmSpy).toHaveBeenCalled();
@@ -222,7 +221,6 @@ describe('Novos Testes Mock', () => {
         confirmSpy.mockRestore();
     });
 
-    // callback openEditModal do Card chamado com a tarefa correta
     it('deve chamar openEditModal com a tarefa correta ao clicar no botão de editar do Card', () => {
         const mockTask = {
             id: 42,

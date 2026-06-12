@@ -1,6 +1,6 @@
 # Task Planner
 
-## 1) Nome do Projeto e Explicação Detalhada
+## 1) Projeto e Explicação
 
 O **Task Planner** é um gerenciador de tarefas interativo baseado no método Kanban (quadro visual com colunas de status). O projeto foi construído utilizando uma arquitetura moderna e desacoplada, dividida em um backend que gerencia a persistência dos dados e regras de negócio, e um frontend interativo que provê a interface do usuário.
 
@@ -9,7 +9,7 @@ O **Task Planner** é um gerenciador de tarefas interativo baseado no método Ka
 - **Backend (Flask & SQLAlchemy)**: Fornece uma API RESTful para gerenciar o ciclo de vida das tarefas (CRUD). Utiliza o PostgreSQL como banco de dados e SQLAlchemy como ORM, além de ferramentas de migração com Flask-Migrate e testes automatizados com Pytest.
 - **Frontend (Next.js, React & TailwindCSS)**: Interface web com design escuro moderno e responsivo. A dinâmica de movimentação de tarefas é gerenciada através de drag and drop utilizando a biblioteca `@dnd-kit/core`.
 
-### Estrutura de Código Relevante
+### Estrutura de Código
 
 - [app.py](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/app.py): Configura a aplicação Flask, CORS, conexão com o banco e inicializa os blueprints das rotas.
 - [task.py (Model)](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/models/task.py): Mapeia o esquema da tabela `tasks` no banco de dados.
@@ -19,6 +19,38 @@ O **Task Planner** é um gerenciador de tarefas interativo baseado no método Ka
 - [Column.tsx](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/components/Column.tsx): Exibe a lista filtrada de tarefas de acordo com seu status.
 - [Card.tsx](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/components/Card.tsx): Representação visual individual de cada tarefa com suas ações correspondentes.
 - [api.ts](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/services/api.ts): Centraliza todas as chamadas de rede à API do backend usando `fetch`.
+
+---
+
+## 2) Funcionalidades e Como Usar
+
+### 🛠️ Funcionalidades do Sistema
+O **Task Planner** provê uma experiência interativa e robusta baseada nas seguintes funcionalidades de negócio:
+- **Painel Kanban Visual**: Organização de tarefas em três raias de status: *A Fazer (To Do)*, *Em Progresso (Doing)* e *Concluído (Done)*.
+- **Criação Dinâmica de Tarefas**: Cadastro de novas demandas contendo título (obrigatório, limite de 100 caracteres), descrição detalhada, data de entrega, hora de entrega e nível de prioridade.
+- **Movimentação Reativa por Drag & Drop**: Transição de status arrastando os cards entre colunas através da biblioteca `@dnd-kit/core`.
+- **Classificação por Prioridade**: Tags visuais coloridas que categorizam as tarefas em prioridade *Alta*, *Média* ou *Baixa*.
+- **Edição Completa**: Alteração reativa de qualquer campo de tarefas existentes.
+- **Remoção de Tarefas**: Deleção permanente de tarefas obsoletas com diálogo de confirmação.
+
+### 🚀 Como Usar a Aplicação
+Uma vez que a aplicação esteja rodando localmente (veja a seção de instalação abaixo):
+1. **Adicionar Tarefas**: 
+   - Clique no botão **"Nova Tarefa"** no canto superior direito.
+   - Preencha o título, descrição, prazos e prioridade no modal.
+   - Clique em **"Criar Tarefa"** para adicioná-la imediatamente na coluna *A Fazer*.
+2. **Progredir Tarefas (Movimentação)**: 
+   - Clique e segure no título do card da tarefa desejada.
+   - Arraste-o para a coluna correspondente ao novo estado e solte. A atualização no banco de dados ocorre automaticamente de forma assíncrona.
+3. **Editar Dados**: 
+   - Clique no ícone de lápis de qualquer card para abrir o modal de edição.
+   - Faça as modificações e clique em **"Salvar"**.
+4. **Remover Registro**: 
+   - Clique no ícone de lixeira no card e confirme o pop-up de segurança no navegador.
+
+### 📝 Histórias de Usuário e Rastreabilidade
+Para a entrega da NP2, as principais Histórias de Usuário, contendo critérios de aceitação no formato *Given/When/Then*, prioridades e a rastreabilidade entre requisitos, commits/PRs e testes automatizados, estão catalogadas no documento:
+- 📖 [docs/historias_usuario.md](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/docs/historias_usuario.md)
 
 ---
 
@@ -47,105 +79,96 @@ Após a análise do código fonte nos diretórios do projeto, os seguintes débi
 
 ---
 
-## 2) Instruções de Instalação e Execução Local
+## 3) Instruções de Instalação e Execução Local
 
 ### Pré-requisitos
 
-- Python 3.10 ou superior
-- Node.js 18.x ou superior (com npm)
-- PostgreSQL instalado e executando localmente (ou ajuste da URL no backend para usar SQLite para desenvolvimento)
+- **Python 3.10 ou superior** (para o backend)
+- **Node.js 18.x ou superior** com `npm` (para o frontend)
+- **Docker e Docker Compose** instalados (opção recomendada para rodar o banco de dados PostgreSQL) ou **PostgreSQL** instalado localmente.
 
 ---
 
-### Executando o Backend (Flask)
+### Passo 1: Executando o Banco de Dados (PostgreSQL via Docker)
 
-1.  Navegue até a pasta raiz do projeto:
+A maneira mais rápida e fácil de rodar o banco de dados é utilizando o Docker Compose já configurado no projeto:
 
-    ```bash
-    cd TaskPlanner
-    ```
-
-2.  Crie um ambiente virtual do Python:
-
-    ```bash
-    python -m venv venv
-    ```
-
-3.  Ative o ambiente virtual:
-    - **Windows (PowerShell)**:
-      ```powershell
-      .\venv\Scripts\Activate.ps1
-      ```
-    - **Linux/macOS**:
-      ```bash
-      source venv/bin/activate
-      ```
-
-4.  Instale as dependências listadas no [requirements.txt](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/requirements.txt):
-
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-5.  Configure as variáveis de ambiente necessárias. Crie um arquivo `.env` na pasta [backend/](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend) contendo:
-
-    ```env
-    DATABASE_URL=postgresql+pg8000://postgres:admin@localhost:5432/tasks_db
-    ```
-
-    _(Ajuste o usuário, senha e porta do banco de acordo com a sua configuração local. Por padrão, se não for especificado, o backend usará o PostgreSQL rodando localmente no endereço acima)_
-
-6.  Crie as tabelas necessárias no banco rodando o script auxiliar:
-
-    ```bash
-    python backend/criar_tabelas.py
-    ```
-
-7.  Execute o servidor do backend:
-
-    ```bash
-    python backend/app.py
-    ```
-
-    _O servidor iniciará no endereço `http://localhost:5000`._
-
-8.  **(Opcional) Executar os testes**:
-    Para validar o funcionamento correto dos endpoints e da lógica de negócio, execute:
-    ```bash
-    pytest backend/
-    ```
+1. Certifique-se de que o Docker Desktop está em execução.
+2. Na raiz do projeto, execute o comando para iniciar apenas o banco de dados em segundo plano:
+   ```bash
+   docker compose up -d db
+   ```
+   *Isso criará um container chamado `postgres-taskplanner` rodando o PostgreSQL na porta `5432` com usuário `postgres`, senha `admin` e a base de dados `tasks_db` já criada.*
 
 ---
 
-### Executando o Frontend (Next.js)
+### Passo 2: Executando o Backend (Flask)
 
-1.  Abra um novo terminal e navegue até a pasta do frontend:
-
-    ```bash
-    cd TaskPlanner/frontend
-    ```
-
-2.  Instale as dependências do Node.js:
-
-    ```bash
-    npm install
-    ```
-
-3.  Configure o arquivo `.env.local` na pasta [frontend/](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend) caso queira mudar a porta de comunicação com o backend:
-
-    ```env
-    NEXT_PUBLIC_API_URL=http://localhost:5000
-    ```
-
-4.  Execute a aplicação em modo de desenvolvimento:
-    ```bash
-    npm run dev
-    ```
-    _O frontend estará disponível em `http://localhost:3000`._
+1. Navegue até a pasta raiz do projeto (se já não estiver nela):
+   ```bash
+   cd TaskPlanner
+   ```
+2. Crie um ambiente virtual do Python:
+   ```bash
+   python -m venv venv
+   ```
+3. Ative o ambiente virtual:
+   - **Windows (PowerShell)**:
+     ```powershell
+     .\venv\Scripts\Activate.ps1
+     ```
+   - **Linux/macOS**:
+     ```bash
+     source venv/bin/activate
+     ```
+4. Instale as dependências:
+   ```bash
+   pip install -r requirements.txt
+   ```
+5. Crie as tabelas necessárias no banco rodando o script auxiliar:
+   ```bash
+   python backend/criar_tabelas.py
+   ```
+   *Você deve ver a mensagem "Tabelas criadas com sucesso!".*
+6. Execute o servidor de desenvolvimento do backend:
+   ```bash
+   python backend/app.py
+   ```
+   *O backend iniciará e escutará no endereço `http://localhost:5000`.*
 
 ---
 
-## 3) Uso Transparente de IA
+### Passo 3: Executando o Frontend (Next.js)
+
+1. Abra um **novo terminal** e navegue até a pasta do frontend:
+   ```bash
+   cd TaskPlanner/frontend
+   ```
+2. Crie um arquivo chamado `.env.local` dentro da pasta `frontend/` com o seguinte conteúdo para apontar para a API do backend:
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:5000
+   ```
+3. Instale as dependências do Node.js:
+   ```bash
+   npm install
+   ```
+4. Execute a aplicação em modo de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
+   *O frontend estará disponível em `http://localhost:3000`.*
+
+---
+
+### 💡 Alternativa Sem Docker (SQLite)
+Caso prefira não usar Docker ou PostgreSQL local, você pode alterar o projeto para usar SQLite (que grava os dados num arquivo local `.db` automaticamente):
+1. No arquivo [backend/app.py](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/app.py) e [backend/criar_tabelas.py](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/criar_tabelas.py), substitua a URL do banco para `sqlite:///tasks.db`.
+2. Delete o banco de dados anterior (se aplicável), rode `python backend/criar_tabelas.py` e inicie o backend normalmente.
+
+---
+
+
+## 4) Uso Transparente de IA
 
 De acordo com as diretrizes do edital da NP2, esta seção detalha o uso ético, produtivo e transparente de inteligência artificial generativa durante o ciclo de desenvolvimento do **Task Planner**.
 
@@ -207,7 +230,7 @@ Apesar da IA atuar como acelerador de desenvolvimento, as seguintes tomadas de d
 
 ---
 
-## 4) Metodologia de Desenvolvimento
+## 5) Metodologia de Desenvolvimento
 
 O processo de desenvolvimento do Task Planner foi conduzido de forma direta e simplificada pela equipe, adaptado para o escopo acadêmico do projeto.
 

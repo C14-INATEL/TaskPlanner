@@ -1,13 +1,14 @@
+from routes.task_routes import task
+from database.database import db
 from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 import os
 
-os.environ.setdefault('DATABASE_URL', 'postgresql+pg8000://postgres:admin@localhost:5432/tasks_db')
+os.environ.setdefault(
+    'DATABASE_URL', 'postgresql+pg8000://postgres:admin@localhost:5432/tasks_db')
 
-from database.database import db
-from routes.task_routes import task
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')

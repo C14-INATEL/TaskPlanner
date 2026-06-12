@@ -113,6 +113,9 @@ describe('Testes de Interação e Estado (Kaua)', () => {
         fireEvent.click(screen.getByText('Nova Tarefa'));
         fireEvent.click(screen.getByText('Adicionar Tarefa'));
 
+        // Dá um tempo curto para possíveis microtasks resolverem e o estado assentar
+        await new Promise(resolve => setTimeout(resolve, 10));
+
         expect(screen.getByText('Sem tarefas pendentes')).toBeInTheDocument();
         expect(screen.getByText('Nada em progresso')).toBeInTheDocument();
         expect(screen.getByText('Nenhuma tarefa concluída')).toBeInTheDocument();
