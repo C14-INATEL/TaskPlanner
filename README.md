@@ -148,7 +148,7 @@ Abaixo está o detalhamento dos prompts reais aplicados no projeto por cada um d
 | 2   | "Crie testes unitários para validações de input no backend: título vazio, espaços, limite de caracteres..." | **Aceita** | Expansão da cobertura de testes para 27 casos de uso. |
 | 3   | "Como criar um job de testes no Jenkins com um stage que rode pytest e jest dentro de um container Docker?" | **Ajustada** | Configuração do ambiente de CI com instalação dinâmica de ferramentas. |
 
-#### lucas David (DevOps & Documentação)
+#### Lucas David (DevOps & Documentação)
 
 | #   | Prompt Real Utilizado | Status | Justificativa Técnica |
 | --- | --- | --- | --- |
