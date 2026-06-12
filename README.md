@@ -11,14 +11,27 @@ O **Task Planner** é um gerenciador de tarefas interativo baseado no método Ka
 
 ### Estrutura de Código Relevante
 
-- [app.py](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/app.py): Configura a aplicação Flask, CORS, conexão com o banco e inicializa os blueprints das rotas.
-- [task.py (Model)](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/models/task.py): Mapeia o esquema da tabela `tasks` no banco de dados.
-- [task_routes.py](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/routes/task_routes.py): Define os endpoints HTTP da API para as operações nas tarefas.
-- [task_services.py](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/services/task_services.py): Centraliza as regras de negócio e validações (ex: tamanho do título, prioridades e status válidos).
-- [Board.tsx](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/components/Board.tsx): Componente principal do Kanban. Controla o estado de arrastar e soltar e os modais de inserção/edição.
-- [Column.tsx](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/components/Column.tsx): Exibe a lista filtrada de tarefas de acordo com seu status.
-- [Card.tsx](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/components/Card.tsx): Representação visual individual de cada tarefa com suas ações correspondentes.
-- [api.ts](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/services/api.ts): Centraliza todas as chamadas de rede à API do backend usando `fetch`.
+- [app.py](backend/app.py): Configura a aplicação Flask, CORS, conexão com o banco e inicializa os blueprints das rotas.
+- [task.py (Model)](backend/models/task.py): Mapeia o esquema da tabela `tasks` no banco de dados.
+- [task_routes.py](backend/routes/task_routes.py): Define os endpoints HTTP da API para as operações nas tarefas.
+- [task_services.py](backend/services/task_services.py): Centraliza as regras de negócio e validações (ex: tamanho do título, prioridades e status válidos).
+- [Board.tsx](frontend/src/components/Board.tsx): Componente principal do Kanban. Controla o estado de arrastar e soltar e os modais de inserção/edição.
+- [Column.tsx](frontend/src/components/Column.tsx): Exibe a lista filtrada de tarefas de acordo com seu status.
+- [Card.tsx](frontend/src/components/Card.tsx): Representação visual individual de cada tarefa com suas ações correspondentes.
+- [api.ts](frontend/src/services/api.ts): Centraliza todas as chamadas de rede à API do backend usando `fetch`.
+
+---
+
+## 2) Funcionalidades e Como Usar
+
+### 🛠️ Funcionalidades do Sistema
+O **Task Planner** provê uma experiência interativa e robusta baseada nas seguintes funcionalidades de negócio:
+- **Painel Kanban Visual**: Organização de tarefas em três raias de status: *A Fazer (To Do)*, *Em Progresso (Doing)* e *Concluído (Done)*.
+- **Criação Dinâmica de Tarefas**: Cadastro de novas demandas contendo título (obrigatório, limite de 100 caracteres), descrição detalhada, data de entrega, hora de entrega e nível de prioridade.
+- **Movimentação Reativa por Drag & Drop**: Transição de status arrastando os cards entre colunas através da biblioteca `@dnd-kit/core`.
+- **Classificação por Prioridade**: Tags visuais coloridas que categorizam as tarefas em prioridade *Alta*, *Média* ou *Baixa*.
+- **Edição Completa**: Alteração reativa de qualquer campo de tarefas existentes.
+- **Remoção de Tarefas**: Deleção permanente de tarefas obsoletas com diálogo de confirmação.
 
 ---
 
@@ -28,135 +41,84 @@ Após a análise do código fonte nos diretórios do projeto, os seguintes débi
 
 #### 1. Banco de Dados e Modelagem
 
-- **Mapeamento Inadequado de Data e Hora**: Os campos `date` e `time` no modelo [task.py (Model)](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/models/task.py) estão mapeados como `db.String(20)` e `db.String(10)`. Isso impossibilita consultas cronológicas performáticas, ordenações robustas nativas do banco e formatações de data no backend. Devem ser refatorados para os tipos nativos do SQLAlchemy (`db.Date` e `db.Time` ou `db.DateTime`).
+- **Mapeamento Inadequado de Data e Hora**: Os campos `date` e `time` no modelo [task.py (Model)](backend/models/task.py) estão mapeados como `db.String(20)` e `db.String(10)`. Isso impossibilita consultas cronológicas performáticas, ordenações robustas nativas do banco e formatações de data no backend. Devem ser refatorados para os tipos nativos do SQLAlchemy (`db.Date` e `db.Time` ou `db.DateTime`).
 - **Falta de Enums no Banco de Dados**: A validação das opções de prioridade (`low`, `medium`, `high`) e status (`todo`, `doing`, `done`) é feita apenas na camada de serviço em memória. O banco de dados aceita qualquer String, o que pode corromper a integridade física dos dados. O ideal é usar o tipo Enum do PostgreSQL/SQLAlchemy.
 
 #### 2. Backend (Flask)
 
-- **Acoplamento do Banco na Camada de Serviços**: As funções no arquivo [task_services.py](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/services/task_services.py) manipulam a sessão do banco diretamente (`db.session`). Recomenda-se a implementação do Repository Pattern para isolar a persistência da lógica de negócio e simplificar testes unitários mockados.
-- **Tratamento de Erros Duplicado nas Rotas**: Há blocos `try/except` repetidos para gerenciar `ValueError` e `TaskNotFound` em cada rota do arquivo [task_routes.py](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/routes/task_routes.py). Isso deve ser simplificado usando manipuladores de erros globais (`@app.errorhandler`) no Flask.
+- **Acoplamento do Banco na Camada de Serviços**: As funções no arquivo [task_services.py](backend/services/task_services.py) manipulam a sessão do banco diretamente (`db.session`). Recomenda-se a implementação do Repository Pattern para isolar a persistência da lógica de negócio e simplificar testes unitários mockados.
+- **Tratamento de Erros Duplicado nas Rotas**: Há blocos `try/except` repetidos para gerenciar `ValueError` e `TaskNotFound` em cada rota do arquivo [task_routes.py](backend/routes/task_routes.py). Isso deve ser simplificado usando manipuladores de erros globais (`@app.errorhandler`) no Flask.
 - **Falta de Validação Declarativa**: As validações são manuais e imperativas. A utilização de bibliotecas de validação como Marshmallow ou Pydantic trará robustez e legibilidade ao código.
 - **Falta de Logs**: A API não implementa um sistema de logs estruturado para registrar erros, acessos ou alterações críticas no banco.
 
 #### 3. Frontend (Next.js / React)
 
-- **Tipagem Duplicada**: O tipo `Task` está duplicado e sendo redefinido nos arquivos [api.ts](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/services/api.ts), [Column.tsx](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/components/Column.tsx) e [Card.tsx](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/components/Card.tsx). O tipo deve ser unificado em um arquivo de tipos centralizado (ex: `src/types/task.ts`).
-- **Área de Clique para Arrastar Reduzida (Usabilidade)**: No [Card.tsx](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/components/Card.tsx), as propriedades do DnD (`attributes` e `listeners`) estão associadas apenas ao container de título. Isso significa que o usuário não pode arrastar o cartão clicando na descrição ou em espaços em branco do card, o que é contra-intuitivo.
-- **Fallback de URL Hardcoded**: No arquivo [api.ts](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/services/api.ts), a URL `http://localhost:5000` está fixada no código. Esse fallback deveria ser configurado apenas nas variáveis de ambiente do ambiente local.
+- **Tipagem Duplicada**: O tipo `Task` está duplicado e sendo redefinido nos arquivos [api.ts](frontend/src/services/api.ts), [Column.tsx](frontend/src/components/Column.tsx) e [Card.tsx](frontend/src/components/Card.tsx). O tipo deve ser unificado em um arquivo de tipos centralizado (ex: `src/types/task.ts`).
+- **Área de Clique para Arrastar Reduzida (Usabilidade)**: No [Card.tsx](frontend/src/components/Card.tsx), as propriedades do DnD (`attributes` e `listeners`) estão associadas apenas ao container de título. Isso significa que o usuário não pode arrastar o cartão clicando na descrição ou em espaços em branco do card, o que é contra-intuitivo.
+- **Fallback de URL Hardcoded**: No arquivo [api.ts](frontend/src/services/api.ts), a URL `http://localhost:5000` está fixada no código. Esse fallback deveria ser configurado apenas nas variáveis de ambiente do ambiente local.
 - **Falta de Feedback Visual de Erros**: O frontend não captura de forma amigável as falhas das chamadas na API. Se o backend estiver fora do ar, o frontend continuará inativo sem informar o usuário adequadamente. A inclusão de um sistema de Toast facilitará a comunicação.
 
 ---
 
-## 2) Instruções de Instalação e Execução Local
+## 3) Instruções de Instalação e Execução Local
 
 ### Pré-requisitos
 
-- Python 3.10 ou superior
-- Node.js 18.x ou superior (com npm)
-- PostgreSQL instalado e executando localmente (ou ajuste da URL no backend para usar SQLite para desenvolvimento)
+- **Python 3.10 ou superior**
+- **Node.js 18.x ou superior** (com npm)
+- **Docker e Docker Compose** instalados (Recomendado para o banco de dados)
 
 ---
 
-### Executando o Backend (Flask)
+### Passo 1: Executando o Banco de Dados (PostgreSQL via Docker)
 
-1.  Navegue até a pasta raiz do projeto:
-
-    ```bash
-    cd TaskPlanner
-    ```
-
-2.  Crie um ambiente virtual do Python:
-
-    ```bash
-    python -m venv venv
-    ```
-
-3.  Ative o ambiente virtual:
-    - **Windows (PowerShell)**:
-      ```powershell
-      .\venv\Scripts\Activate.ps1
-      ```
-    - **Linux/macOS**:
-      ```bash
-      source venv/bin/activate
-      ```
-
-4.  Instale as dependências listadas no [requirements.txt](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/requirements.txt):
-
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-5.  Configure as variáveis de ambiente necessárias. Crie um arquivo `.env` na pasta [backend/](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend) contendo:
-
-    ```env
-    DATABASE_URL=postgresql+pg8000://postgres:admin@localhost:5432/tasks_db
-    ```
-
-    _(Ajuste o usuário, senha e porta do banco de acordo com a sua configuração local. Por padrão, se não for especificado, o backend usará o PostgreSQL rodando localmente no endereço acima)_
-
-6.  Crie as tabelas necessárias no banco rodando o script auxiliar:
-
-    ```bash
-    python backend/criar_tabelas.py
-    ```
-
-7.  Execute o servidor do backend:
-
-    ```bash
-    python backend/app.py
-    ```
-
-    _O servidor iniciará no endereço `http://localhost:5000`._
-
-8.  **(Opcional) Executar os testes**:
-    Para validar o funcionamento correto dos endpoints e da lógica de negócio, execute:
-    ```bash
-    pytest backend/
-    ```
+1. Certifique-se de que o Docker está em execução.
+2. Na raiz do projeto, execute:
+   ```bash
+   docker-compose up -d db
+   ```
+   *Isso iniciará o PostgreSQL na porta 5432 com as credenciais padrão.*
 
 ---
 
-### Executando o Frontend (Next.js)
+### Passo 2: Executando o Backend (Flask)
 
-1.  Abra um novo terminal e navegue até a pasta do frontend:
-
-    ```bash
-    cd TaskPlanner/frontend
-    ```
-
-2.  Instale as dependências do Node.js:
-
-    ```bash
-    npm install
-    ```
-
-3.  Configure o arquivo `.env.local` na pasta [frontend/](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend) caso queira mudar a porta de comunicação com o backend:
-
-    ```env
-    NEXT_PUBLIC_API_URL=http://localhost:5000
-    ```
-
-4.  Execute a aplicação em modo de desenvolvimento:
-    ```bash
-    npm run dev
-    ```
-    _O frontend estará disponível em `http://localhost:3000`._
+1. Navegue até a pasta raiz:
+   ```bash
+   cd TaskPlanner
+   ```
+2. Configure o ambiente virtual e instale dependências:
+   ```bash
+   python -m venv venv
+   .\venv\Scripts\Activate.ps1  # Windows
+   pip install -r requirements.txt
+   ```
+3. Crie as tabelas e inicie o servidor:
+   ```bash
+   python backend/criar_tabelas.py
+   python backend/app.py
+   ```
 
 ---
 
-## 3) Uso Transparente de IA
+### Passo 3: Executando o Frontend (Next.js)
+
+1. Em um novo terminal, entre na pasta frontend:
+   ```bash
+   cd TaskPlanner/frontend
+   ```
+2. Instale dependências e inicie:
+   ```bash
+   npm install
+   npm run dev
+   ```
+   *Acesse em http://localhost:3000.*
+
+---
+
+## 4) Uso Transparente de IA
 
 De acordo com as diretrizes do edital da NP2, esta seção detalha o uso ético, produtivo e transparente de inteligência artificial generativa durante o ciclo de desenvolvimento do **Task Planner**.
-
-### Ferramentas Utilizadas e Dinâmica de Trabalho
-
-Utilizou-se o **ChatGPT** (OpenAI) e o **Antigravity CLI** (Gemini - Google) no fluxo de trabalho com as seguintes abordagens:
-
-- **Dinâmica Individual (Pesquisa e Documentação)**: Utilização do ChatGPT para tirar dúvidas sintáticas de bibliotecas específicas (como manipulação de estados do `@dnd-kit`), validação de queries SQLAlchemy e escrita de rascunhos de testes unitários.
-- **Pair Programming (Programação em Par)**: Uso do Antigravity CLI (Gemini) como copiloto ativo no terminal, fornecendo auxílio em tempo real para análises estruturais da base de código, mapeamento automático de débitos técnicos e otimização pontual de rotas.
-
----
 
 ### Registro de Prompts por Integrante
 
@@ -164,76 +126,75 @@ Abaixo está o detalhamento dos prompts reais aplicados no projeto por cada um d
 
 #### Gustavo Silva Marques (Desenvolvedor Backend & Banco de Dados)
 
-| #   | Prompt Real Utilizado                                                                                         | Status         | Justificativa Técnica                                                                                                                                                                                                                             |
-| --- | ------------------------------------------------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | "Eu tive um erro aqui: building 'psycopg2._psycopg' extension error: Microsoft Visual C++ 14.0 or greater is required"               | **Aceita**     | A IA identificou que o erro acontecia porque o Windows precisava de ferramentas de compilação para instalar o psycopg2-binary. A IA sugeriu três alternativas: usar --only-binary=:all:, tentar --pre, e por último trocar para o psycopg[binary] que é a versão 3 sem necessidade de compilação. A IA também orientou a atualizar o requirements.txt com a opção que funcionasse.                    |
-| 2   | "Como corrigir o erro received warnings: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy" | **Aceita**   | A IA explicou que o aviso acontecia porque o Task.query.get() era uma forma antiga do SQLAlchemy 1.x que estava sendo descontinuada na versão 2.0. A IA orientou a trocar todos os Task.query.get(task_id) pela forma nova db.session.get(Task, task_id) nas funções get_task_by_id, update_task e delete_task. A IA também explicou o motivo dos warnings existirem — os desenvolvedores os usam para avisar antes de remover uma funcionalidade de vez, dando tempo para o código ser atualizado gradualmente.                           |
-| 3   | "Me ajuda a fazer o pyproject.toml no me projeto?"         | **Descartada** | A IA sugeriu colocar "setuptools.backends.legacy:build", o que acabou gerando o erro `Cannot import 'setuptools.backends.legacy'`. Além disse, a IA também não empacotou os pacotes corretos, o que gerou o erro `Multiple top-level packages discovered in a flat-layout: ['models', 'routes', 'database', 'services', 'migrations']`
+| #   | Prompt Real Utilizado | Status | Justificativa Técnica |
+| --- | --- | --- | --- |
+| 1   | "Eu tive um erro aqui: building 'psycopg2._psycopg' extension error: Microsoft Visual C++ 14.0 or greater is required" | **Aceita** | Sugestão de uso de versões binárias do driver para evitar compilação no Windows. |
+| 2   | "Como corrigir o erro received warnings: LegacyAPIWarning: The Query.get() method is considered legacy..." | **Aceita** | Atualização para sintaxe moderna do SQLAlchemy 2.0 (`db.session.get`). |
+| 3   | "Me ajuda a fazer o pyproject.toml no me projeto?" | **Descartada** | A IA sugeriu configurações obsoletas de setuptools que geraram erros de importação. |
 
 #### [Nome do Integrante 2] (Desenvolvedor Frontend & UI/UX)
 
-| #   | Prompt Real Utilizado                                                                                                           | Status         | Justificativa Técnica                                                                                                                                                                                                                                                                                                  |
-| --- | ------------------------------------------------------------------------------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | "Crie um layout moderno de quadro Kanban usando Tailwind CSS com fundo gradiente escuro e bordas translúcidas (glassmorphism)." | **Aceita**     | O design de cores (`bg-gradient-to-br from-gray-950 via-indigo-950...`) e a estilização dos cartões gerada pela IA foram incorporados diretamente no [Board.tsx](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/components/Board.tsx) atendendo perfeitamente à expectativa estética. |
-| 2   | "Como implementar o DndContext do @dnd-kit/core no React para arrastar cards entre colunas?"                                    | **Ajustada**   | O código inicial gerado pela IA servia apenas para listas verticais simples de colunas únicas. Foi adaptado para lidar com três colunas Kanban paralelas e com a renderização dinâmica do `DragOverlay`.                                                                                                               |
-| 3   | "Como fazer chamadas HTTP usando a biblioteca Axios no Next.js App Router."                                                     | **Descartada** | A resposta recomendava adicionar o pacote `axios` e configurar interceptores redundantes para o escopo. Para manter a performance e a simplicidade de dependências, optou-se pela API nativa de `fetch` em [api.ts](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/services/api.ts).  |
+| #   | Prompt Real Utilizado | Status | Justificativa Técnica |
+| --- | --- | --- | --- |
+| 1   | "Crie um layout moderno de quadro Kanban usando Tailwind CSS com fundo gradiente escuro..." | **Aceita** | Design de cores e estilização visual dos cards. |
+| 2   | "Como implementar o DndContext do @dnd-kit/core no React para arrastar cards entre colunas?" | **Ajustada** | Adaptação para múltiplas colunas e renderização de DragOverlay. |
+| 3   | "Como fazer chamadas HTTP usando a biblioteca Axios no Next.js App Router." | **Descartada** | Optou-se pelo uso da API nativa `fetch` para simplificação. |
 
 #### Marcus Vinícius de Faria Junho Filho (Engenheiro de QA / Testes)
 
 | #   | Prompt Real Utilizado | Status | Justificativa Técnica |
 | --- | --- | --- | --- |
-| 1   | "Atualize os testes unitários das rotas Flask para usar mock.side_effect com exceções no lugar de mock.return_value com tuplas, adequando ao novo padrão de tratamento de erros." | **Aceita** | O código gerado corrigiu os 3 testes que falhavam substituindo o padrão antigo de tuplas `(resultado, erro)` por `mock.side_effect` lançando `ValueError` e `TaskNotFound`, alinhando os testes ao comportamento real das rotas. |
-| 2   | "Crie testes unitários para validações de input no backend: título vazio, título com só espaços, título acima de 100 caracteres, priority inválida e status inválido." | **Aceita** | O código gerado adicionou 9 testes ao `test_task_services.py` e 6 ao `test_task_routes.py`, cobrindo os novos casos de erro com `mock.side_effect` e `pytest.raises`, totalizando 27 testes na suíte. |
-| 3   | "Como criar um job de testes no Jenkins com um stage que rode pytest no backend e jest no frontend, dentro de um container Docker sem Python e Node instalados?" | **Ajustada** | O código sugerido inicialmente não funcionava pois o container do Jenkins não possuía Python, Node.js e npm instalados. A solução foi ajustada para instalar essas ferramentas automaticamente via setup-ambientes.sh na imagem Docker customizada, e posteriormente corrigir o problema de quebra de linha (\r\n) do Windows que impedia a execução do script dentro do container Linux. |
+| 1   | "Atualize os testes unitários das rotas Flask para usar mock.side_effect com exceções..." | **Aceita** | Alinhamento dos testes ao novo comportamento de tratamento de erros global. |
+| 2   | "Crie testes unitários para validações de input no backend: título vazio, espaços, limite de caracteres..." | **Aceita** | Expansão da cobertura de testes para 27 casos de uso. |
+| 3   | "Como criar um job de testes no Jenkins com um stage que rode pytest e jest dentro de um container Docker?" | **Ajustada** | Configuração do ambiente de CI com instalação dinâmica de ferramentas. |
 
-#### lucas David (DevOps & Documentação)
+#### Lucas David (DevOps & Documentação)
 
-| #   | Prompt Real Utilizado                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Status         | Justificativa Técnica                                                                                                                                                                                            |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | agy "Crie a infraestrutura inicial de CI/CD para o nosso projeto Task Planner utilizando Jenkins com Docker, seguindo o padrão Docker-out-of-Docker (DooD). Para isso, crie dois arquivos na raiz do projeto: 1) Um arquivo 'docker-compose.yml' configurado para subir o serviço do Jenkins (imagem lts-jdk17) na porta 8080, mapeando o volume 'jenkins_home' e o socket do docker '/var/run/docker.sock' do host. 2) Um arquivo 'Jenkinsfile' contendo a estrutura base de uma pipeline declarativa (agent any) contendo apenas o primeiro estágio (stage) chamado 'Setup & Dependency Check'. Esse estágio deve conter os passos em shell (sh) para validar o ambiente e instalar as dependências do Python (ativando o venv e lendo o requirements.txt) e as dependências do Node.js dentro da pasta 'frontend'. Deixe placeholders claros no topo do Jenkinsfile indicando que este primeiro estágio foi desenvolvido e comitado por mim (Lucas, no papel de DevOps)." | **Aceita**     | A lista gerada cobriu eficientemente todas as dependências locais e caches de compilação, sendo salva diretamente no repositório.                                                                                |
-| 2   | "Como configurar um script Python simples que limpa todas as migrações antigas do Flask-Migrate e recria o banco de dados PostgreSQL local."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | **Ajustada**   | O script gerado tentava remover pastas do sistema operacional que geravam erros de permissão de escrita no Windows. O script foi ajustado para utilizar chamadas integradas do CLI do Flask de forma sequencial. |
-| 3   | "Crie um workflow do GitHub Actions para rodar testes pytest e build do Nextjs em cada push para a branch main."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | **Descartada** | A IA gerou uma esteira de CI/CD utilizando múltiplos containers Docker que ultrapassavam a cota gratuita do GitHub Actions. Decidiu-se automatizar localmente via hooks do git.                                  |
-
----
-
-### O que NÃO foi feito por IA (Desenvolvido à Mão)
-
-Apesar da IA atuar como acelerador de desenvolvimento, as seguintes tomadas de decisão e lógicas foram integralmente estruturadas à mão pelos integrantes do grupo:
-
-1.  **Arquitetura de Banco de Dados**: A modelagem relacional lógica das tabelas e a decisão conceitual de não expor chaves estrangeiras complexas nesta fase inicial.
-2.  **Políticas de CORS**: A configuração restritiva e de segurança da comunicação de origens cruzadas em `CORS(app, origins=["http://localhost:3000"])`.
-3.  **UI/UX e Identidade Visual**: A conceituação da paleta de cores escura e o design de micro-interações do painel de tarefas que dão o aspecto premium da aplicação.
-4.  **Regras de Negócio Críticas**: Os limites lógicos de tratamento de strings, sanitização manual de strings nos serviços do backend e tomadas de decisão de fluxos alternativos de erros.
+| #   | Prompt Real Utilizado | Status | Justificativa Técnica |
+| --- | --- | --- | --- |
+| 1   | "Crie a infraestrutura inicial de CI/CD para o nosso projeto Task Planner utilizando Jenkins com Docker (DooD)..." | **Aceita** | Configuração da pipeline Jenkins e suporte a containers. |
+| 2   | "Verifique se o README está seguindo o padrão pedido no projeto, caso não liste o que deve ser alterado..." | **Aceita** | Auditoria de conformidade com o edital NP2. |
+| 3   | "Com base no Jenkinsfile e no docker-compose.yml, escreva uma seção 'Processo de CI/CD' para o README.md..." | **Aceita** | Formalização da documentação técnica da automação. |
 
 ---
 
-## 4) Metodologia de Desenvolvimento
+## 5) Metodologia de Desenvolvimento
 
-O processo de desenvolvimento do Task Planner foi conduzido de forma direta e simplificada pela equipe, adaptado para o escopo acadêmico do projeto.
+O processo de desenvolvimento do Task Planner foi conduzido através de um fluxo focado em **Integração Contínua** e **Revisão por Pares**.
 
 ### Organização e Ferramentas
 
-- **Ausência de Metodologias Ágeis**: A equipe **não utilizou** metodologias ágeis formais (como Scrum, Kanban ou Sprints) para controle, planejamento e rastreamento de tarefas.
-- **Comunicação Direta**: Não foram utilizadas ferramentas de gestão corporativas ou quadros de tarefas externos (como Jira, Trello ou GitHub Projects). Todo o alinhamento de tarefas, sincronização de progresso e resolução de dúvidas de desenvolvimento ocorreu de forma exclusiva através de um grupo de comunicação no **WhatsApp**.
-- **Integração via Pull Requests (PRs)**: Para garantir a consistência e qualidade do código compartilhado, a equipe utilizou a prática de **Pull Requests obrigatórios** para cada push ou envio de código ao repositório central. Nenhuma modificação era integrada diretamente na branch principal sem antes passar pela aprovação e validação visual de outro integrante do grupo.
-
----
+- **Comunicação Direta**: Alinhamentos diários via WhatsApp para sincronização de progresso.
+- **Integração via Pull Requests (PRs)**: Uso obrigatório de PRs para cada envio de código, garantindo que nenhuma modificação fosse integrada sem a revisão de outro integrante.
+- **Métricas**: Monitoramento de issues e Pull Requests para controle de entrega.
 
 ### Divisão de Papéis da Equipe
 
-A equipe de 4 integrantes foi distribuída de acordo com seus respectivos papéis e áreas de foco no projeto:
-
-- **`Gustavo Silva Marques` (Desenvolvedor Backend)**: Focado na modelagem do banco de dados PostgreSQL, criação e otimização dos endpoints REST, conexões com banco e script de carga inicial.
-- **`[Nome do Integrante 2]` (Desenvolvedor Frontend)**: Focado na arquitetura do Next.js, estruturação dos componentes reativos de interface (Kanban, Colunas, Cards) e na integração das APIs de Drag and Drop.
-- **`Marcus Vinícius de Faria Junho Filho` (Engenheiro de QA / Testes)**: Focado no desenvolvimento da suíte de testes unitários e de integração no backend, configuração das fixtures de banco em memória e garantia de estabilidade do código.
-- **`Lucas David` (DevOps & Documentação)**: Focado no gerenciamento de versionamento do repositório, documentação do projeto, configurações ambientais locais de implantação e controle de PRs.
-
----
+- **`Gustavo Silva Marques`**: Desenvolvedor Backend & Banco de Dados.
+- **`[Nome do Integrante 2]`**: Desenvolvedor Frontend & UI/UX.
+- **`Marcus Vinícius de Faria Junho Filho`**: Engenheiro de QA / Testes.
+- **`Lucas David`**: DevOps & Documentação Lead.
 
 ### Definição de Pronto (DoD - Definition of Done)
 
-Para que uma atividade seja considerada como **Pronta (Concluída)** e integrada ao repositório, ela deve cumprir os seguintes critérios de aceitação básicos:
+1. **Revisão do Pull Request (PR)**: Código revisado e aprovado.
+2. **Testes Automatizados**: Suíte local de testes rodando com 100% de sucesso.
+3. **Execução Sem Falhas**: Funcionalidade testada localmente em ambiente Docker.
 
-1.  **Revisão do Pull Request (PR)**: O código foi submetido via PR e aprovado por pelo menos outro integrante da equipe antes do merge final.
-2.  **Testes Automatizados**: A suíte local de testes (`pytest`) deve rodar com 100% de sucesso.
-3.  **Execução Sem Falhas**: A funcionalidade deve ser executada localmente sem gerar erros no console do Flask (backend) ou nas ferramentas do desenvolvedor do navegador (frontend).
+---
+
+## 6) Processo de CI/CD (Servidor Jenkins)
+
+### 🔧 Ferramenta Oficial
+Atendendo ao requisito de **não utilizar o GitHub Actions**, adotamos o **Jenkins** como ferramenta oficial, rodando em container Docker (DooD).
+
+### 🏃 Estágios da Pipeline
+1. **Setup**: Validação de ambiente e instalação de dependências.
+2. **Build Backend**: Geração de artefatos de distribuição do Python.
+3. **Testes**: Execução de testes automatizados (Pytest e Jest).
+
+---
+
+## 7) Histórias de Usuário e Rastreabilidade
+As histórias de usuário completas, contendo critérios de aceitação e matriz de rastreabilidade, estão disponíveis em:
+- [docs/historias_usuario.md](docs/historias_usuario.md)
