@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:lts-jdk17
+FROM jenkins/jenkins:lts-jdk17-slim
 
 # Alterna para root para instalar os pacotes de sistema
 USER root
