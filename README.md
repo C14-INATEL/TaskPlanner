@@ -178,13 +178,13 @@ Abaixo está o detalhamento dos prompts reais aplicados no projeto por cada um d
 | 2   | "Como implementar o DndContext do @dnd-kit/core no React para arrastar cards entre colunas?"                                    | **Ajustada**   | O código inicial gerado pela IA servia apenas para listas verticais simples de colunas únicas. Foi adaptado para lidar com três colunas Kanban paralelas e com a renderização dinâmica do `DragOverlay`.                                                                                                               |
 | 3   | "Como fazer chamadas HTTP usando a biblioteca Axios no Next.js App Router."                                                     | **Descartada** | A resposta recomendava adicionar o pacote `axios` e configurar interceptores redundantes para o escopo. Para manter a performance e a simplicidade de dependências, optou-se pela API nativa de `fetch` em [api.ts](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/frontend/src/services/api.ts).  |
 
-#### [Nome do Integrante 3] (Engenheiro de QA / Testes)
+#### Marcus Vinícius de Faria Junho Filho (Engenheiro de QA / Testes)
 
-| #   | Prompt Real Utilizado                                                                                          | Status         | Justificativa Técnica                                                                                                                                                                                                                      |
-| --- | -------------------------------------------------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | "Escreva uma fixture do Pytest para criar um banco de dados SQLite em memória para testes de rotas Flask."     | **Aceita**     | O código sugerido estruturou o fluxo de inicialização com `db.create_all()` e limpeza com `db.drop_all()` no [conftest.py](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/conftest.py), funcionando no pytest. |
-| 2   | "Como simular uma requisição PUT de JSON no cliente de teste do Flask com Pytest?"                             | **Ajustada**   | O exemplo sugeria o uso básico de `client.put()`, mas foi ajustado manualmente para serializar os dados via `json.dumps()` e definir o cabeçalho `"Content-Type": "application/json"` para evitar erros de leitura no endpoint.            |
-| 3   | "Escreva testes de unidade para testar o DndContext e as interações de drag-and-drop do frontend com Cypress." | **Descartada** | O código gerado acoplava os seletores do Cypress a classes dinâmicas e randômicas do CSS, o que gerava falso-negativos frequentes nos testes. Decidiu-se cobrir a funcionalidade por testes exploratórios manuais.                         |
+| #   | Prompt Real Utilizado | Status | Justificativa Técnica |
+| --- | --- | --- | --- |
+| 1   | "Atualize os testes unitários das rotas Flask para usar mock.side_effect com exceções no lugar de mock.return_value com tuplas, adequando ao novo padrão de tratamento de erros." | **Aceita** | O código gerado corrigiu os 3 testes que falhavam substituindo o padrão antigo de tuplas `(resultado, erro)` por `mock.side_effect` lançando `ValueError` e `TaskNotFound`, alinhando os testes ao comportamento real das rotas. |
+| 2   | "Crie testes unitários para validações de input no backend: título vazio, título com só espaços, título acima de 100 caracteres, priority inválida e status inválido." | **Aceita** | O código gerado adicionou 9 testes ao `test_task_services.py` e 6 ao `test_task_routes.py`, cobrindo os novos casos de erro com `mock.side_effect` e `pytest.raises`, totalizando 27 testes na suíte. |
+| 3   | "Como criar um job de testes no Jenkins com um stage que rode pytest no backend e jest no frontend, dentro de um container Docker sem Python e Node instalados?" | **Ajustada** | O código sugerido inicialmente não funcionava pois o container do Jenkins não possuía Python, Node.js e npm instalados. A solução foi ajustada para instalar essas ferramentas automaticamente via setup-ambientes.sh na imagem Docker customizada, e posteriormente corrigir o problema de quebra de linha (\r\n) do Windows que impedia a execução do script dentro do container Linux. |
 
 #### lucas David (DevOps & Documentação)
 
@@ -225,7 +225,7 @@ A equipe de 4 integrantes foi distribuída de acordo com seus respectivos papéi
 
 - **`Gustavo Silva Marques` (Desenvolvedor Backend)**: Focado na modelagem do banco de dados PostgreSQL, criação e otimização dos endpoints REST, conexões com banco e script de carga inicial.
 - **`[Nome do Integrante 2]` (Desenvolvedor Frontend)**: Focado na arquitetura do Next.js, estruturação dos componentes reativos de interface (Kanban, Colunas, Cards) e na integração das APIs de Drag and Drop.
-- **`[Nome do Integrante 3]` (Engenheiro de QA / Testes)**: Focado no desenvolvimento da suíte de testes unitários e de integração no backend, configuração das fixtures de banco em memória e garantia de estabilidade do código.
+- **`Marcus Vinícius de Faria Junho Filho` (Engenheiro de QA / Testes)**: Focado no desenvolvimento da suíte de testes unitários e de integração no backend, configuração das fixtures de banco em memória e garantia de estabilidade do código.
 - **`Lucas David` (DevOps & Documentação)**: Focado no gerenciamento de versionamento do repositório, documentação do projeto, configurações ambientais locais de implantação e controle de PRs.
 
 ---
