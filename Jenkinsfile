@@ -32,6 +32,23 @@ pipeline {
             }
         }
 
+        stage('Build Frontend') {
+            steps {
+                // Estágio de Build do Frontend (Next.js) - Kaua
+                dir('frontend') {
+                    sh 'npm run build'
+                }
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: 'frontend/.next/**', fingerprint: true
+                }
+                failure {
+                    echo "Build do Frontend falhou. Verifique os logs para detalhes."
+                }
+            }
+        }
+
         stage('Testes') {
             steps {
                 sh '''
