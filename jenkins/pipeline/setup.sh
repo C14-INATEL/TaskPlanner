@@ -16,6 +16,7 @@ source venv/bin/activate || . venv/bin/activate
 pip install --upgrade pip
 
 echo "--- Instalando Dependências do Backend ---"
+pip install build
 pip install -r requirements.txt
 
 echo "--- Instalando Dependências do Frontend ---"

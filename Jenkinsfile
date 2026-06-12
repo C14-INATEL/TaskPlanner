@@ -10,7 +10,25 @@ pipeline {
     stages {
         stage('Setup & Dependency Check') {
             steps {
+                // Mantendo a prática de scripts externos (Lucas)
                 sh 'chmod +x ./jenkins/pipeline/setup.sh && ./jenkins/pipeline/setup.sh'
+            }
+        }
+
+        stage('Build Backend') {
+            steps {
+                // Incorporando o estágio de Build do Gustavo
+                dir('backend') {
+                    sh '. ../venv/bin/activate && python3 -m build'
+                }
+            }
+            post {
+                success {
+                    archiveArtifacts artifacts: 'backend/dist/**', fingerprint: true
+                }
+                failure {
+                    echo "Build do Backend falhou. Verifique os logs para detalhes."
+                }
             }
         }
 
