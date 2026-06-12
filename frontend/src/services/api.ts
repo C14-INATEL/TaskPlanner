@@ -1,13 +1,11 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+import type { Task } from "@/types/task"
 
-export type Task = {
-  id: number
-  title: string
-  description: string
-  date: string
-  time: string
-  status: string
-  priority: "low" | "medium" | "high"
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+
+if (!API_URL) {
+  console.warn(
+    "NEXT_PUBLIC_API_URL não está definida. Configure-a em um arquivo .env.local (veja .env.example)."
+  )
 }
 
 export async function fetchTasks(): Promise<Task[]> {
