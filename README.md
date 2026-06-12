@@ -162,11 +162,11 @@ Utilizou-se o **ChatGPT** (OpenAI) e o **Antigravity CLI** (Gemini - Google) no 
 
 Abaixo está o detalhamento dos prompts reais aplicados no projeto por cada um dos 4 integrantes do grupo.
 
-#### [Nome do Integrante 1] (Desenvolvedor Backend & Banco de Dados)
+#### Gustavo Silva Marques (Desenvolvedor Backend & Banco de Dados)
 
 | #   | Prompt Real Utilizado                                                                                         | Status         | Justificativa Técnica                                                                                                                                                                                                                             |
 | --- | ------------------------------------------------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | "Como configurar o Flask-Migrate com uma instância do SQLAlchemy separada no arquivo `app.py`?"               | **Aceita**     | A estrutura de inicialização e vinculação sugerida funcionou perfeitamente no [app.py](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/app.py) sem requerer modificações sintáticas adicionais.                        |
+| 1   | "eu tive um erro aqui: building 'psycopg2._psycopg' extension error: Microsoft Visual C++ 14.0 or greater is required"               | **Aceita**     | A estrutura de inicialização e vinculação sugerida funcionou perfeitamente no [app.py](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/app.py) sem requerer modificações sintáticas adicionais.                        |
 | 2   | "Refatore a função `create_task` para retornar um dicionário e salvar a tarefa no banco usando o SQLAlchemy." | **Ajustada**   | A IA propôs o salvamento direto no banco e o retorno correto do método `to_dict()`, mas foi necessário adicionar manualmente as validações `.strip()` e a checagem do limite de 100 caracteres exigido pelo edital.                               |
 | 3   | "Como usar o pg8000 para se conectar a um banco de dados remoto sem precisar instalar bibliotecas C?"         | **Descartada** | A IA sugeriu alterar a string de conexão para utilizar drivers adicionais que exigiam dependências locais do psycopg2, o que causava falhas de compilação no Windows. Optou-se por configurar manualmente o driver `postgresql+pg8000://` nativo. |
 
