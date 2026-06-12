@@ -120,7 +120,35 @@ Após a análise do código fonte nos diretórios do projeto, os seguintes débi
 
 De acordo com as diretrizes do edital da NP2, esta seção detalha o uso ético, produtivo e transparente de inteligência artificial generativa durante o ciclo de desenvolvimento do **Task Planner**.
 
-### Registro de Prompts por Integrante (Lucas David - DevOps)
+### Registro de Prompts por Integrante
+
+Abaixo está o detalhamento dos prompts reais aplicados no projeto por cada um dos 4 integrantes do grupo.
+
+#### Gustavo Silva Marques (Desenvolvedor Backend & Banco de Dados)
+
+| #   | Prompt Real Utilizado | Status | Justificativa Técnica |
+| --- | --- | --- | --- |
+| 1   | "Eu tive um erro aqui: building 'psycopg2._psycopg' extension error: Microsoft Visual C++ 14.0 or greater is required" | **Aceita** | Sugestão de uso de versões binárias do driver para evitar compilação no Windows. |
+| 2   | "Como corrigir o erro received warnings: LegacyAPIWarning: The Query.get() method is considered legacy..." | **Aceita** | Atualização para sintaxe moderna do SQLAlchemy 2.0 (`db.session.get`). |
+| 3   | "Me ajuda a fazer o pyproject.toml no me projeto?" | **Descartada** | A IA sugeriu configurações obsoletas de setuptools que geraram erros de importação. |
+
+#### [Nome do Integrante 2] (Desenvolvedor Frontend & UI/UX)
+
+| #   | Prompt Real Utilizado | Status | Justificativa Técnica |
+| --- | --- | --- | --- |
+| 1   | "Crie um layout moderno de quadro Kanban usando Tailwind CSS com fundo gradiente escuro..." | **Aceita** | Design de cores e estilização visual dos cards. |
+| 2   | "Como implementar o DndContext do @dnd-kit/core no React para arrastar cards entre colunas?" | **Ajustada** | Adaptação para múltiplas colunas e renderização de DragOverlay. |
+| 3   | "Como fazer chamadas HTTP usando a biblioteca Axios no Next.js App Router." | **Descartada** | Optou-se pelo uso da API nativa `fetch` para simplificação. |
+
+#### Marcus Vinícius de Faria Junho Filho (Engenheiro de QA / Testes)
+
+| #   | Prompt Real Utilizado | Status | Justificativa Técnica |
+| --- | --- | --- | --- |
+| 1   | "Atualize os testes unitários das rotas Flask para usar mock.side_effect com exceções..." | **Aceita** | Alinhamento dos testes ao novo comportamento de tratamento de erros global. |
+| 2   | "Crie testes unitários para validações de input no backend: título vazio, espaços, limite de caracteres..." | **Aceita** | Expansão da cobertura de testes para 27 casos de uso. |
+| 3   | "Como criar um job de testes no Jenkins com um stage que rode pytest e jest dentro de um container Docker?" | **Ajustada** | Configuração do ambiente de CI com instalação dinâmica de ferramentas. |
+
+#### lucas David (DevOps & Documentação)
 
 | #   | Prompt Real Utilizado | Status | Justificativa Técnica |
 | --- | --- | --- | --- |
@@ -132,7 +160,26 @@ De acordo com as diretrizes do edital da NP2, esta seção detalha o uso ético,
 
 ## 5) Metodologia de Desenvolvimento
 
-A equipe utilizou um fluxo focado em **Integração Contínua** e **Revisão por Pares**, utilizando Pull Requests obrigatórios para garantir a qualidade do código.
+O processo de desenvolvimento do Task Planner foi conduzido através de um fluxo focado em **Integração Contínua** e **Revisão por Pares**.
+
+### Organização e Ferramentas
+
+- **Comunicação Direta**: Alinhamentos diários via WhatsApp para sincronização de progresso.
+- **Integração via Pull Requests (PRs)**: Uso obrigatório de PRs para cada envio de código, garantindo que nenhuma modificação fosse integrada sem a revisão de outro integrante.
+- **Métricas**: Monitoramento de issues e Pull Requests para controle de entrega.
+
+### Divisão de Papéis da Equipe
+
+- **`Gustavo Silva Marques`**: Desenvolvedor Backend & Banco de Dados.
+- **`[Nome do Integrante 2]`**: Desenvolvedor Frontend & UI/UX.
+- **`Marcus Vinícius de Faria Junho Filho`**: Engenheiro de QA / Testes.
+- **`Lucas David`**: DevOps & Documentação Lead.
+
+### Definição de Pronto (DoD - Definition of Done)
+
+1. **Revisão do Pull Request (PR)**: Código revisado e aprovado.
+2. **Testes Automatizados**: Suíte local de testes rodando com 100% de sucesso.
+3. **Execução Sem Falhas**: Funcionalidade testada localmente em ambiente Docker.
 
 ---
 
@@ -149,5 +196,5 @@ Atendendo ao requisito de **não utilizar o GitHub Actions**, adotamos o **Jenki
 ---
 
 ## 7) Histórias de Usuário e Rastreabilidade
-As histórias de usuário completas e a matriz de rastreabilidade estão disponíveis em:
+As histórias de usuário completas, contendo critérios de aceitação e matriz de rastreabilidade, estão disponíveis em:
 - [docs/historias_usuario.md](docs/historias_usuario.md)
