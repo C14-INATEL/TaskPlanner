@@ -2,16 +2,7 @@ import { useDroppable } from "@dnd-kit/core"
 import { memo } from "react"
 import { LayoutList, Loader, CheckCircle } from "lucide-react"
 import Card from "./Card"
-
-type Task = {
-  id: number
-  title: string
-  description: string
-  date: string
-  time: string
-  status: string
-  priority: "low" | "medium" | "high"
-}
+import type { Task } from "@/types/task"
 
 type ColumnProps = {
   title: string

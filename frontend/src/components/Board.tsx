@@ -1,5 +1,5 @@
 "use client"
-import { Plus, X, LayoutGrid, Folder, Bell, Search } from "lucide-react"
+import { Plus, X, LayoutGrid, Bell } from "lucide-react"
 import { useState, useEffect } from "react"
 import {
   DndContext,
@@ -8,12 +8,15 @@ import {
   DragOverlay
 } from "@dnd-kit/core"
 import Column from "./Column"
-import { fetchTasks, createTask as apiCreate, updateTask as apiUpdate, deleteTask as apiDelete, Task } from "@/services/api"
+import { fetchTasks, createTask as apiCreate, updateTask as apiUpdate, deleteTask as apiDelete } from "@/services/api"
+import type { Task, Priority } from "@/types/task"
+import { useToast } from "./Toast"
 
 const inputStyle =
   "w-full bg-gray-700/50 border border-white/10 rounded-xl px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
 
 export default function Board() {
+  const toast = useToast()
   const [tasks, setTasks] = useState<Task[]>([])
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
@@ -24,22 +27,30 @@ export default function Board() {
     description: "",
     date: "",
     time: "",
-    priority: "medium" as "low" | "medium" | "high"
+    priority: "medium" as Priority
   })
 
   useEffect(() => {
-    fetchTasks().then(setTasks).catch(console.error)
-  }, [])
+    fetchTasks()
+      .then(setTasks)
+      .catch(() =>
+        toast.error("Não foi possível carregar as tarefas. Verifique se o servidor está ativo.")
+      )
+  }, [toast])
 
   async function addTask() {
-    if (!newTask.title.trim()) return
+    if (!newTask.title.trim()) {
+      toast.info("Informe um título para a tarefa.")
+      return
+    }
     try {
       const created = await apiCreate({ ...newTask, status: "todo" })
       setTasks(prev => [...prev, created])
       setNewTask({ title: "", description: "", date: "", time: "", priority: "medium" })
       setShowForm(false)
-    } catch (err) {
-      console.error(err)
+      toast.success("Tarefa criada com sucesso!")
+    } catch {
+      toast.error("Erro ao criar a tarefa. Tente novamente.")
     }
   }
 
@@ -48,8 +59,9 @@ export default function Board() {
     try {
       await apiDelete(id)
       setTasks(prev => prev.filter(t => t.id !== id))
-    } catch (err) {
-      console.error(err)
+      toast.success("Tarefa excluída.")
+    } catch {
+      toast.error("Erro ao excluir a tarefa.")
     }
   }
 
@@ -57,14 +69,14 @@ export default function Board() {
     setEditingTask(task)
   }
 
-  async function saveEditTask(updatedTask: Task) 
-  {
+  async function saveEditTask(updatedTask: Task) {
     try {
       await apiUpdate(updatedTask.id, updatedTask)
       setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t))
       setEditingTask(null)
-    } catch (err) {
-      console.error(err)
+      toast.success("Tarefa atualizada.")
+    } catch {
+      toast.error("Erro ao salvar as alterações.")
     }
   }
 
@@ -86,8 +98,8 @@ export default function Board() {
       setTasks(prev =>
         prev.map(task => task.id === taskId ? { ...task, status: newStatus } : task)
       )
-    } catch (err) {
-      console.error(err)
+    } catch {
+      toast.error("Não foi possível mover a tarefa.")
     }
   }
 
@@ -103,25 +115,6 @@ export default function Board() {
             </div>
             Task Planner
           </span>
-
-          <div className="hidden md:flex gap-1">
-            <button className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-200 hover:bg-white/8 px-3 py-1.5 rounded-lg transition">
-              <LayoutGrid size={13} /> Boards
-            </button>
-            <button className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-200 hover:bg-white/8 px-3 py-1.5 rounded-lg transition">
-              <Folder size={13} /> Projetos
-            </button>
-          </div>
-        </div>
-
-        <div className="flex-1 flex justify-center px-6">
-          <div className="relative w-72">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none" />
-            <input
-              placeholder="Buscar tarefas..."
-              className="w-full bg-white/5 border border-white/8 rounded-xl pl-9 pr-4 py-2 text-sm text-gray-300 placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-            />
-          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -229,7 +222,7 @@ export default function Board() {
                     <select
                       value={newTask.priority}
                       onChange={(e) =>
-                        setNewTask({ ...newTask, priority: e.target.value as "low" | "medium" | "high" })
+                        setNewTask({ ...newTask, priority: e.target.value as Priority })
                       }
                       className={inputStyle}
                     >
@@ -333,7 +326,7 @@ export default function Board() {
                   <select
                     value={editingTask.priority}
                     onChange={(e) =>
-                      setEditingTask({ ...editingTask, priority: e.target.value as "low" | "medium" | "high" })
+                      setEditingTask({ ...editingTask, priority: e.target.value as Priority })
                     }
                     className={inputStyle}
                   >

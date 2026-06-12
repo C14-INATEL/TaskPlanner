@@ -1,15 +1,6 @@
 import { useDraggable } from "@dnd-kit/core"
 import { Pencil, Trash2, Calendar, Clock } from "lucide-react"
-
-type Task = {
-  id: number
-  title: string
-  description: string
-  date: string
-  time: string
-  status: string
-  priority: "low" | "medium" | "high"
-}
+import type { Task } from "@/types/task"
 
 type CardProps = {
   task: Task
@@ -30,14 +21,12 @@ export default function Card({ task, deleteTask, openEditModal }: CardProps) {
   return (
     <div
       ref={setNodeRef}
-      className={`group bg-gray-800/90 backdrop-blur p-4 rounded-xl shadow-md hover:shadow-xl hover:shadow-black/40 transition-all duration-200 hover:-translate-y-0.5 flex flex-col gap-3 border border-white/8 border-l-4 ${p.border}`}
+      {...listeners}
+      {...attributes}
+      className={`group cursor-grab active:cursor-grabbing bg-gray-800/90 backdrop-blur p-4 rounded-xl shadow-md hover:shadow-xl hover:shadow-black/40 transition-all duration-200 hover:-translate-y-0.5 flex flex-col gap-3 border border-white/8 border-l-4 ${p.border}`}
     >
       <div className="flex justify-between items-start gap-2">
-        <div
-          {...listeners}
-          {...attributes}
-          className="cursor-grab active:cursor-grabbing font-semibold text-gray-100 text-sm leading-snug flex-1"
-        >
+        <div className="font-semibold text-gray-100 text-sm leading-snug flex-1">
           {task.title}
         </div>
 
