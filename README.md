@@ -132,13 +132,13 @@ Abaixo está o detalhamento dos prompts reais aplicados no projeto por cada um d
 | 2   | "Como corrigir o erro received warnings: LegacyAPIWarning: The Query.get() method is considered legacy..." | **Aceita** | Atualização para sintaxe moderna do SQLAlchemy 2.0 (`db.session.get`). |
 | 3   | "Me ajuda a fazer o pyproject.toml no me projeto?" | **Descartada** | A IA sugeriu configurações obsoletas de setuptools que geraram erros de importação. |
 
-#### [Nome do Integrante 2] (Desenvolvedor Frontend & UI/UX)
+#### Kauã Victor Garcia Siécola (Desenvolvedor Frontend & UI/UX)
 
 | #   | Prompt Real Utilizado | Status | Justificativa Técnica |
 | --- | --- | --- | --- |
-| 1   | "Crie um layout moderno de quadro Kanban usando Tailwind CSS com fundo gradiente escuro..." | **Aceita** | Design de cores e estilização visual dos cards. |
-| 2   | "Como implementar o DndContext do @dnd-kit/core no React para arrastar cards entre colunas?" | **Ajustada** | Adaptação para múltiplas colunas e renderização de DragOverlay. |
-| 3   | "Como fazer chamadas HTTP usando a biblioteca Axios no Next.js App Router." | **Descartada** | Optou-se pelo uso da API nativa `fetch` para simplificação. |
+| 1   | "Me ajuda com o sistema de drag and drop dos cards entre as colunas do Kanban?" | **Ajustada** | Tornou o card inteiro arrastável, mas foi preciso isolar os botões de editar/excluir com `stopPropagation` para o clique não disparar o arrasto. |
+| 2   | "Me explique como se faz um job de build no Jenkins para o frontend." | **Aceita** | Criação do stage "Build Frontend" (`npm run build`) espelhando o build do backend; de quebra, identificou um tipo duplicado que quebrava a compilação. |
+| 3   | "Me ajuda a arrumar os testes quebrados do front?" | **Ajustada** | Testes reescritos para mockar o serviço de API e envolver no `ToastProvider`, substituindo a antiga lógica baseada em `localStorage`. |
 
 #### Marcus Vinícius de Faria Junho Filho (Engenheiro de QA / Testes)
 
@@ -171,7 +171,7 @@ O processo de desenvolvimento do Task Planner foi conduzido através de um fluxo
 ### Divisão de Papéis da Equipe
 
 - **`Gustavo Silva Marques`**: Desenvolvedor Backend & Banco de Dados.
-- **`[Nome do Integrante 2]`**: Desenvolvedor Frontend & UI/UX.
+- **`Kauã Victor Garcia Siécola`**: Desenvolvedor Frontend & UI/UX.
 - **`Marcus Vinícius de Faria Junho Filho`**: Engenheiro de QA / Testes.
 - **`Lucas David`**: DevOps & Documentação Lead.
 
@@ -191,7 +191,8 @@ Atendendo ao requisito de **não utilizar o GitHub Actions**, adotamos o **Jenki
 ### 🏃 Estágios da Pipeline
 1. **Setup**: Validação de ambiente e instalação de dependências.
 2. **Build Backend**: Geração de artefatos de distribuição do Python.
-3. **Testes**: Execução de testes automatizados (Pytest e Jest).
+3. **Build Frontend**: Compilação de produção do Next.js (`npm run build`).
+4. **Testes**: Execução de testes automatizados (Pytest e Jest).
 
 ---
 
