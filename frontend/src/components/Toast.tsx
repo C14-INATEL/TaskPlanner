@@ -99,8 +99,5 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       </div>
     </ToastContext.Provider>
   )
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 197f49713e4e88b092f9820920033538050164eb
+
