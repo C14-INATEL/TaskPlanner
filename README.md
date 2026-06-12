@@ -162,13 +162,13 @@ Utilizou-se o **ChatGPT** (OpenAI) e o **Antigravity CLI** (Gemini - Google) no 
 
 Abaixo está o detalhamento dos prompts reais aplicados no projeto por cada um dos 4 integrantes do grupo.
 
-#### [Nome do Integrante 1] (Desenvolvedor Backend & Banco de Dados)
+#### Gustavo Silva Marques (Desenvolvedor Backend & Banco de Dados)
 
 | #   | Prompt Real Utilizado                                                                                         | Status         | Justificativa Técnica                                                                                                                                                                                                                             |
 | --- | ------------------------------------------------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | "Como configurar o Flask-Migrate com uma instância do SQLAlchemy separada no arquivo `app.py`?"               | **Aceita**     | A estrutura de inicialização e vinculação sugerida funcionou perfeitamente no [app.py](file:///C:/Users/lucas/Documents/INATEL/P8/C14/projeto/TaskPlanner/backend/app.py) sem requerer modificações sintáticas adicionais.                        |
-| 2   | "Refatore a função `create_task` para retornar um dicionário e salvar a tarefa no banco usando o SQLAlchemy." | **Ajustada**   | A IA propôs o salvamento direto no banco e o retorno correto do método `to_dict()`, mas foi necessário adicionar manualmente as validações `.strip()` e a checagem do limite de 100 caracteres exigido pelo edital.                               |
-| 3   | "Como usar o pg8000 para se conectar a um banco de dados remoto sem precisar instalar bibliotecas C?"         | **Descartada** | A IA sugeriu alterar a string de conexão para utilizar drivers adicionais que exigiam dependências locais do psycopg2, o que causava falhas de compilação no Windows. Optou-se por configurar manualmente o driver `postgresql+pg8000://` nativo. |
+| 1   | "Eu tive um erro aqui: building 'psycopg2._psycopg' extension error: Microsoft Visual C++ 14.0 or greater is required"               | **Aceita**     | A IA identificou que o erro acontecia porque o Windows precisava de ferramentas de compilação para instalar o psycopg2-binary. A IA sugeriu três alternativas: usar --only-binary=:all:, tentar --pre, e por último trocar para o psycopg[binary] que é a versão 3 sem necessidade de compilação. A IA também orientou a atualizar o requirements.txt com a opção que funcionasse.                    |
+| 2   | "Como corrigir o erro received warnings: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy" | **Aceita**   | A IA explicou que o aviso acontecia porque o Task.query.get() era uma forma antiga do SQLAlchemy 1.x que estava sendo descontinuada na versão 2.0. A IA orientou a trocar todos os Task.query.get(task_id) pela forma nova db.session.get(Task, task_id) nas funções get_task_by_id, update_task e delete_task. A IA também explicou o motivo dos warnings existirem — os desenvolvedores os usam para avisar antes de remover uma funcionalidade de vez, dando tempo para o código ser atualizado gradualmente.                           |
+| 3   | "Me ajuda a fazer o pyproject.toml no me projeto?"         | **Descartada** | A IA sugeriu colocar "setuptools.backends.legacy:build", o que acabou gerando o erro `Cannot import 'setuptools.backends.legacy'`. Além disse, a IA também não empacotou os pacotes corretos, o que gerou o erro `Multiple top-level packages discovered in a flat-layout: ['models', 'routes', 'database', 'services', 'migrations']`
 
 #### [Nome do Integrante 2] (Desenvolvedor Frontend & UI/UX)
 
@@ -223,7 +223,7 @@ O processo de desenvolvimento do Task Planner foi conduzido de forma direta e si
 
 A equipe de 4 integrantes foi distribuída de acordo com seus respectivos papéis e áreas de foco no projeto:
 
-- **`[Nome do Integrante 1]` (Desenvolvedor Backend)**: Focado na modelagem do banco de dados PostgreSQL, criação e otimização dos endpoints REST, conexões com banco e script de carga inicial.
+- **`Gustavo Silva Marques` (Desenvolvedor Backend)**: Focado na modelagem do banco de dados PostgreSQL, criação e otimização dos endpoints REST, conexões com banco e script de carga inicial.
 - **`[Nome do Integrante 2]` (Desenvolvedor Frontend)**: Focado na arquitetura do Next.js, estruturação dos componentes reativos de interface (Kanban, Colunas, Cards) e na integração das APIs de Drag and Drop.
 - **`[Nome do Integrante 3]` (Engenheiro de QA / Testes)**: Focado no desenvolvimento da suíte de testes unitários e de integração no backend, configuração das fixtures de banco em memória e garantia de estabilidade do código.
 - **`Lucas David` (DevOps & Documentação)**: Focado no gerenciamento de versionamento do repositório, documentação do projeto, configurações ambientais locais de implantação e controle de PRs.
