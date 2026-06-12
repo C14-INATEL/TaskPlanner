@@ -1,7 +1,6 @@
 import type { Config } from 'jest';
 import nextJest from 'next/jest.js';
 
-// Diz ao Jest onde está o projeto Next.js para ele carregar as configurações
 const createJestConfig = nextJest({
   dir: './',
 });
